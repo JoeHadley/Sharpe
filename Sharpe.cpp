@@ -2,58 +2,100 @@
 #include <fstream>
 #include <random>
 #include <vector>
-#include <time.h>
-#include <ctime>
-
-#include <bits/stdc++.h>
+#include <cmath>
 using namespace std;
 
-
+// Class for weapons. Internal variables are firingSpeed, firingHeight and shotSpread
 class weapon{
+   
     public:
     
     double firingSpeed;
     double firingHeight;
+    double shotSpread;
 
-    weapon(double v0, double h1){
+    // Constructor sets the weapon's stats
+    weapon(double v0, double h1, double sigma){
         firingSpeed = v0;
         firingHeight = h1;
+        // Shot Spread is given in degrees, but internally we want to use radians:
+        shotSpread = sigma*M_PI/180;
     }
 
 
+
+    // Function to find the optimal angle for the weapon at a given distance with a given target 
+    double findOptimalAngle(double d, double yt, double g){
+
+        // Calculate the optimal angle. See Joe's notes for working out that this is the correct formula
+        double tanTheta =  firingSpeed*firingSpeed/(g*d) - sqrt( pow(firingSpeed,4)/pow(g*d,2)  -  (1 + 2*pow(firingSpeed,2)*(yt-firingHeight)/(g*pow(d,2)))  );
+        double thetaC = atan(tanTheta);
+        return thetaC;
+    }
 };
 
-double findOptimalAngle(double v0, double g, double d, double yt, double h1){
 
-    double thetaC = atan( pow(v0,2)/(g*d) - sqrt( pow(v0,4)/pow(g*d,2)  -  (1 + 2*pow(v0,2)/(g*pow(d,2)*(yt-h1)))  ));
 
-    return thetaC;
 
+
+// Function that runs a hypothetical fireShot() function 15 times and gathers the outputs in a vector 
+vector<double> doTrial(weapon gun, double distance, double targetLowerBound, double targetUpperBound){
+
+    int shotNumber = 15;
+    vector<double> shotLocations = {};
+
+
+    // For each shot in the trial, get a y-value at the distance
+    for (int i = 0; i<shotNumber; i++){
+        // Placeholder for fireShot() function:
+        /*
+        double y_value = fireShot(weapon gun, double distance);
+        shotLocations.push_back(y_value);
+        */
+    }
+    
 }
+
+
+// A function that takes the array of shot locations from a trial and counts how many hit the target.
+int countHits(vector<double> shotArray,double targetLowerBound, double targetUpperBound){
+    
+    int hitCount = 0;
+    for (int i = 0; i<shotArray.size(); i++){
+
+        if (shotArray[i] <= targetUpperBound and shotArray[i] >= targetLowerBound){
+            hitCount++;
+        }
+    }   
+    return hitCount;
+}
+
+
+
 
 
 
 int main(){
 
-    double g = 9.81;
-    double d = 100;
-    double yt = 1.3;
-    
-
-    weapon musket(450,0.7);
-
-    double v0 = musket.firingSpeed;
-    double h1 = musket.firingHeight;
+    // Constants that won't change for this project:
+    const double targetUpperBound = 2.3;
+    const double targetLowerBound = 0.3;
+    const double targetCentre = (targetUpperBound + targetLowerBound)/2;
+    const double g = 9.81;
 
 
+    // Constants that may change:
+    double distance = 100;
 
 
-    double thetaC = findOptimalAngle(v0,g,d,yt,h1);
+    // Declare weapon objects with their firing speed, firing height, and shot spread in degrees. The weapon class constructor will convert to radians.
+    weapon musket(450,0.7, 3.0);
+    weapon rifle(600, 0.3, 1.0);
 
 
+    // Find optimal angle
+    double thetaC = musket.findOptimalAngle(distance, targetCentre, g);
     cout << thetaC;
-
-
 
 
     return 0;
