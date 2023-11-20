@@ -43,19 +43,23 @@ void rnum(double& input, opt_angle){ //gaussian distribution for the angle with 
       input = distr(gen);
 }
 double average(vector<double> Q, double z){ //code for finding the average of a vector
-    for (int i = 0; i < 1000; ++i)//change 1000 to the no. of shots 
+   int N = Q.size();
+   
+   for (int i = 0; i < N; ++i)//change 1000 to the no. of shots 
     {
         z = z+Q[i];
     }
-    double av = z/1000;
+    double av = z/N;
     cout << "average is " << av;
     return av;
 }
 
-double stand_dev(vector<double> Q, double var, double mean){ //code for finding the average of a vector
-for (int i = 0; i < 1000; ++i)//change 1000 to the no. of shots 
+double stand_dev(vector<double> Q, double var, double mean){ //code for finding the standard deviation of a vector
+
+   int N = Q.size();
+   for (int i = 0; i < N; ++i)//change 1000 to the no. of shots 
     {
-       var = var+((Q[i]-mean)^2)/1000;
+       var = var + pow(Q[i]-mean,2)/N;
     }
    double sd = sqrt(var)
    cout << "standard deviation is " << sd;
