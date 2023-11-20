@@ -34,8 +34,14 @@ class weapon{
     }
 };
 
-
-
+void rnum(double& input, opt_angle){
+      const double mean = opt_angle;
+      const double standdev = 3;
+      random_device rand_dev;
+      mt19937 gen(rand_dev());
+      normal_distribution<double> distr(mean, standdev);
+      input = distr(gen);
+}
 
 
 // Function that runs a hypothetical fireShot() function 15 times and gathers the outputs in a vector 
