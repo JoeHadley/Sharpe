@@ -52,6 +52,17 @@ double average(vector<double> Q, double z){ //code for finding the average of a 
     return av;
 }
 
+double stand_dev(vector<double> Q, double var, double mean){ //code for finding the average of a vector
+for (int i = 0; i < 1000; ++i)//change 1000 to the no. of shots 
+    {
+       var = var+((Q[i]-mean)^2)/1000;
+    }
+   double sd = sqrt(var)
+   cout << "standard deviation is " << sd;
+   return sd;
+   
+}
+
 
 // Function that runs a hypothetical fireShot() function 15 times and gathers the outputs in a vector 
 vector<double> doTrial(weapon gun, double distance, double targetLowerBound, double targetUpperBound){
