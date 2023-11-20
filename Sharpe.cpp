@@ -34,7 +34,7 @@ class weapon{
     }
 };
 
-void rnum(double& input, opt_angle){
+void rnum(double& input, opt_angle){ //gaussian distribution for the angle with standard deviation  3 degrees (does this need to be in radians?)
       const double mean = opt_angle;
       const double standdev = 3;
       random_device rand_dev;
