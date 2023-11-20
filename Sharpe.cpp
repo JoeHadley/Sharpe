@@ -42,6 +42,15 @@ void rnum(double& input, opt_angle){ //gaussian distribution for the angle with 
       normal_distribution<double> distr(mean, standdev);
       input = distr(gen);
 }
+double average(vector<double> Q, double z){ //code for finding the average of a vector
+    for (int i = 0; i < 1000; ++i)//change 1000 to the no. of shots 
+    {
+        z = z+Q[i];
+    }
+    double av = z/1000;
+    cout << "average is " << av;
+    return av;
+}
 
 
 // Function that runs a hypothetical fireShot() function 15 times and gathers the outputs in a vector 
