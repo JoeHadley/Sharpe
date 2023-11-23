@@ -15,7 +15,19 @@ mt19937 initializeRandomGenerator() {
     return rng;
 }
 
+void linspace(vector<double> &interpVector, double startValue, double endValue, int numPoints) {
+    interpVector.clear();
 
+    if (numPoints == 1){
+        interpVector.push_back(startValue);
+    }
+    else {
+        double step = (endValue - startValue) / (numPoints - 1);
+        for (int n = 0; n < numPoints; n++) {
+            interpVector.push_back(startValue + step * n);
+        }
+    }
+}
 
 // Target class to hold distances
 class target{
@@ -65,7 +77,64 @@ public:
         }
 
         myfile << "))" << "\n";
-        myfile << "plt.hist("<<array_name<<")" << "\n" << "plt.show()"  << "\n";
+        myfile << "bins = np.unique(" << array_name<<")"<<"\n";
+        myfile << "plt.hist("<<array_name<<",bins)" << "\n" << "plt.show()"  << "\n";
+        myfile.close();
+    }
+
+
+    void write_out_comparison_vectors(const std::string& indepVar_name, const std::vector<T>& indepVar,const vector<std::string>& depVar_names, const vector<std::vector<T>>& depVars,const vector<std::string>& depVarError_names, const vector<std::vector<T>>& depVarErrors)
+    {
+        std::ofstream myfile;
+        myfile.open(filename, std::ios_base::app);
+
+        // Write the independent variable
+        myfile << indepVar_name << " = np.array((" << "\n";
+        for (auto i = 0; i < indepVar.size(); ++i) {
+            if (i != (indepVar.size() - 1)) {
+                myfile << indepVar.at(i) << ", " << "\n";
+            } else {
+                myfile << indepVar.at(i) << "\n";
+            }
+        }
+        myfile << "))" << "\n";
+
+        // Write each dependent variable
+        for (int j = 0 ; j < depVar_names.size(); j++){
+
+
+
+            myfile << depVar_names[j] << " = np.array((" << "\n";
+            for (auto i = 0; i < depVars[j].size(); ++i) {
+                if (i != (depVars[j].size() - 1)) {
+                    myfile << depVars[j].at(i) << ", " << "\n";
+                } else {
+                    myfile << depVars[j].at(i) << "\n";
+                }
+            }
+            myfile << "))" << "\n";
+
+
+            myfile << depVarError_names[j] << " = np.array((" << "\n";
+            for (auto i = 0; i < depVarErrors[j].size(); ++i) {
+                if (i != (depVarErrors[j].size() - 1)) {
+                    myfile << depVarErrors[j].at(i) << ", " << "\n";
+                } else {
+                    myfile << depVarErrors[j].at(i) << "\n";
+                }
+            }
+            myfile << "))" << "\n";
+        
+        
+        
+        
+            myfile << "plt.errorbar(" << indepVar_name << "," << depVar_names[j] << "," << depVarError_names[j] << ")"<< "\n";
+        
+        
+        
+        }
+
+        myfile << "plt.show()"  << "\n";
         myfile.close();
     }
 };
@@ -239,6 +308,7 @@ vector<double>  doTrial(weapon gun, target target, double timeLength, int &hitCo
 
     // Use a number of shots based on each gun's firing rate and the time in a trial
     int shotNumber = floor(timeLength*gun.firingRate);
+    cout << gun.name << ": " << shotNumber << " shots" << endl;
     
 
     vector<double> shotLocations(shotNumber);
@@ -312,7 +382,8 @@ int main(){
     sniper.takeAim(target);
     baseball.takeAim(target);
 
-    vector<double> distances = {50,100,150,200};
+    vector<double> distances = {};
+    linspace(distances,1,100,1000);
 
     vector <double>  musketDistanceAccuracies(distances.size());
     vector <double>  musketDistanceErrors(distances.size());
@@ -347,8 +418,9 @@ int main(){
 
 
             // Something about the rifle is returning no results
-            cout << "Rifle: " << rifleHitCount << endl;
+            
             vector<double> rifleShots = doTrial(rifle,target,trialLength,rifleHitCount,rng);
+            cout << "Rifle: " << rifleHitCount << endl;
             rifleTrialHits[i] = rifleHitCount;
             rifleTrialAccuracy[i] = double(rifleHitCount)/double(floor(trialLength*rifle.firingRate));
             rifleHitCount = 0;
@@ -358,6 +430,9 @@ int main(){
 
         musketDistanceAccuracies[j] = average(musketTrialAccuracy);
         musketDistanceErrors[j] = stand_dev(musketTrialAccuracy);
+
+        rifleDistanceAccuracies[j] = average(rifleTrialAccuracy);
+        rifleDistanceErrors[j] = stand_dev(rifleTrialAccuracy);
 
 
     }
@@ -371,11 +446,27 @@ int main(){
   
 
 
-    //WritePyData<int> writer("hitCounts.py");
+    WritePyData<int> writer("hitCounts.py");
 
-    //string name = "hitCounts";
+    string name = "hitCounts";
 
-    //writer.write_out_hist_vector("my_array", musketTrialHits );    
+    writer.write_out_hist_vector("my_array", musketTrialHits );
+
+
+
+
+    WritePyData<double> writer2("weaponComparison.py");
+
+
+
+    vector<string> varNames = {"musketAccuracies","rifleAccuracies"};
+    vector<string> varErrorNames = {"musketErrors","rifleErrors"};
+    vector<vector<double>> overallAccuracies = {musketDistanceAccuracies,rifleDistanceAccuracies};
+    vector<vector<double>> overallErrors = {musketDistanceErrors,rifleDistanceErrors};
+    
+
+
+    writer2.write_out_comparison_vectors("distances", distances,varNames,overallAccuracies,varErrorNames,overallErrors);
     
 
 
