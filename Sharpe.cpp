@@ -308,7 +308,7 @@ vector<double>  doTrial(weapon gun, target target, double timeLength, int &hitCo
 
     // Use a number of shots based on each gun's firing rate and the time in a trial
     int shotNumber = floor(timeLength*gun.firingRate);
-    cout << gun.name << ": " << shotNumber << " shots" << endl;
+    //cout << gun.name << ": " << shotNumber << " shots" << endl;
     
 
     vector<double> shotLocations(shotNumber);
@@ -359,7 +359,7 @@ int main(){
 
    
     int trialLength = 5; // Minutes
-    int trialNumber = 100;
+    int trialNumber = 1000000;
 
 
 
@@ -383,7 +383,7 @@ int main(){
     baseball.takeAim(target);
 
     vector<double> distances = {};
-    linspace(distances,1,100,1000);
+    linspace(distances,1,100,100);
 
     vector <double>  musketDistanceAccuracies(distances.size());
     vector <double>  musketDistanceErrors(distances.size());
@@ -394,6 +394,8 @@ int main(){
 
 
     for (int j = 0; j < distances.size(); j++ ){
+
+        cout << distances[j] <<"/" << "100" << endl;
 
         // Function to change where the target is, and where the weapons in the array are aiming (Doesn't work right now!)
         //changeDistance({&musket},target,distances[j]);
@@ -413,16 +415,19 @@ int main(){
             vector<double> musketShots = doTrial(musket,target,trialLength,musketHitCount,rng);
             //cout << "Musket: " << musketHitCount << endl;
             musketTrialHits[i] = musketHitCount;
-            musketTrialAccuracy[i] = double(musketHitCount)/double(floor(trialLength*musket.firingRate));
+            //musketTrialAccuracy[i] = double(musketHitCount)/double(floor(trialLength*musket.firingRate));
+            musketTrialAccuracy[i] = double(musketHitCount);
+            
             musketHitCount = 0;
 
 
             // Something about the rifle is returning no results
             
             vector<double> rifleShots = doTrial(rifle,target,trialLength,rifleHitCount,rng);
-            cout << "Rifle: " << rifleHitCount << endl;
+            //cout << "Rifle: " << rifleHitCount << endl;
             rifleTrialHits[i] = rifleHitCount;
-            rifleTrialAccuracy[i] = double(rifleHitCount)/double(floor(trialLength*rifle.firingRate));
+            //rifleTrialAccuracy[i] = double(rifleHitCount)/double(floor(trialLength*rifle.firingRate));
+            rifleTrialAccuracy[i] = double(rifleHitCount);            
             rifleHitCount = 0;
 
 
@@ -430,6 +435,7 @@ int main(){
 
         musketDistanceAccuracies[j] = average(musketTrialAccuracy);
         musketDistanceErrors[j] = stand_dev(musketTrialAccuracy);
+        
 
         rifleDistanceAccuracies[j] = average(rifleTrialAccuracy);
         rifleDistanceErrors[j] = stand_dev(rifleTrialAccuracy);
